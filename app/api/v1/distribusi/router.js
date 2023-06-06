@@ -1,27 +1,36 @@
-const express = require('express');
+const express = require("express");
 const router = express();
-const { create, index, update, find, destroy, download, downloadDistribusiPDF, importExcel, count } = require('./controler');
-const { authenticateUser, authhorizeRoles } = require('../../../middlewares/auth');
+const {
+  create,
+  index,
+  update,
+  find,
+  destroy,
+  download,
+  downloadDistribusiPDF,
+  importExcel,
+  count,
+} = require("./controler");
+const { authenticateUser, authhorizeRoles } = require("../../../middlewares/auth");
 
-const upload = require('../../../middlewares/multer');
+const upload = require("../../../middlewares/multer");
 
+router.post("/distribusi", authenticateUser, authhorizeRoles("admin"), create);
 
-router.post('/distribusi', authenticateUser, authhorizeRoles('admin'),  create);
+router.get("/distribusi", index);
 
-router.get('/distribusi',  index);
+router.get("/distribusi/:id", authenticateUser, authhorizeRoles("admin", "user_laundry"), find);
 
-router.get('/distribusi/:id', authenticateUser, authhorizeRoles('admin'),  find);
+router.put("/distribusi/:id", update);
 
-router.put('/distribusi/:id',  update);
+router.delete("/distribusi/:id", authenticateUser, authhorizeRoles("admin", "user_laundry"), destroy);
 
-router.delete('/distribusi/:id', authenticateUser, authhorizeRoles('admin'), destroy);
+router.get("/distribusiDownload", download);
 
-router.get('/distribusiDownload', download);
+router.get("/distribusiDownloadPdf", downloadDistribusiPDF);
 
-router.get('/distribusiDownloadPdf',authenticateUser, downloadDistribusiPDF);
+router.post("/distribusi/upload", upload.single("excel"), authenticateUser, importExcel);
 
-router.post('/distribusi/upload', upload.single('excel'), authenticateUser, authhorizeRoles('admin'), importExcel);
-
-router.get('/distribusiCount', authenticateUser, count)
+router.get("/distribusiCount", authenticateUser, count);
 
 module.exports = router;
